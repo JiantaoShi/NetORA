@@ -1,0 +1,117 @@
+---
+title: "Network-based pathway over-representation analysis with NetORA"
+author: "Jiantao Shi"
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('NetORA')`"
+abstract: >
+  We have developed a R package [NetGAP](https://github.com/JiantaoShi/NetGPA) for network-based gene prioritization using text-mining and coexpression networks. NetORA is an extension of this package to perform network-based pathway enrichment analysis.
+
+output:
+  BiocStyle::pdf_document:
+    fig_width: 6 
+    fig_height: 4
+    toc: true
+
+bibliography: library.bib
+
+vignette: >
+  %\VignetteIndexEntry{Network-based pathway over-representation analysis with NetORA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding[utf8]{inputenc}
+---
+
+# Intruduction
+Genome wide association studies (GWAS) have been successfully used to identify disease-associated variants, however the causal genes in many diseases remain elusive, due to effects such as linkage disequilibrium (LD) between associated variants and long-range regulation. Direct experimental validation of the many potential causal genes is expensive and difficult, so an attractive first step is to prioritize genes with respect their biological relevance. Numerous evidences suggest genes function in pathway-level, so different disease causal genes might function in the same causal pathway. Pathways can be annotated as un-structured gene sets (Reactome), structured tree (GO) or even networks. We have implemented the algorithm of GRAIL [@Raychaudhuri2009] in R as a package NetGPA and provide both text-mining and coexpression networks. We have demonstrated coexpression network-based gene prioritization is more sensitive when gene expression signatures are provided as seeds [@Roccaro2016]. NetORA is an extension of NetGPA to perform network-based pathway enrichment analysis.
+
+# Standard workflow
+To demonstrate the input and output data format in NetORA, we use example data sets in NetGPA.
+
+```{r Standard workflow, eval=TRUE}
+
+library("NetGPA")
+library("NetORA")
+data("Example_NetGPA")
+
+names(Example_NetGPA)
+
+```
+
+## Input
+
+Similar as other pathway-enrichment analysis, NetORA expect annotated pathways and signatures as input. Since it's a network-based method, a network is also required.
+
+### Pathways
+
+In vignettes of NetGPA, we have used gene prioritization to identify pathways that drive DNA methylation transformation [@Smith2017]. Here we took an more intuitive approach by directly performing network-based pathway enrichment analysis.
+
+```{r ExE Hyper-methylated genes, eval=TRUE}
+
+# Genes near hyper-methylated CpG Islands in Mouse ExE
+ExE_Hyper     <- Example_NetGPA$ExE_Hyper
+
+```
+
+We treat `ExE_Hyper` as a annotated pathway.
+
+### Signatures
+Signatures are gene sets we want to test. Here we use pathways that are frequently mutated in cancers as signatures.
+
+```{r Query genes, eval=TRUE}
+
+# show example query genes
+Cancer_GeneSet   <- Example_NetGPA$Cancer_GeneSet
+names(Cancer_GeneSet)
+
+```
+
+### Background
+
+Background represents all possible genes evaluated when signatures are defined. For microarray studies, background is all genes measured in a microarray platform; For RNA-seq studies, background is all genes in genome.
+
+### Global networks
+NetORA us NetGPA a back-end and thus requires networks in the same format, as described below. A gene network is represented as an integer matrix, in which column names are all genes included and each column contains top nearest neighbors of the gene indicated by column name. Here we will use a global text-mining network as an example. 
+
+```{r Global networks, eval=TRUE}
+
+# build a example global gene-network
+data(text_2006_12_NetGPA)
+networkMatrix <- text_2006_12_NetGPA
+
+dim(networkMatrix)
+networkMatrix[1:10, c("IL12B", "TET2")]
+colnames(networkMatrix)[7408]
+
+```
+
+In the example shown above, a network covers 18835 genes and the nearest neighbor of IL12B is shown as 7408, which is the 7408th element of column names (gene IL12A). 
+
+## Quick Start
+Now we have a pathway `ExE_Hyper`, gene signatures in `Cancer_GeneSet` and networks in `text_2006_12_NetGPA`.
+
+```{r Quick Start, eval=TRUE}
+
+# Network-based pathway enrichment analysis
+queryTable <- NetORA_Pre(ExE_Hyper, text_2006_12_NetGPA, progressBar = FALSE)
+PG <- colnames(text_2006_12_NetGPA)
+mergedT <- NetORA_GS(Cancer_GeneSet, queryTable, PG, FDR = 0.05)
+
+mergedT[order(mergedT$pvalue), ]
+
+```
+You can clearly see that only FGF-related signaling pathways are statistically significant.
+
+# Network databases
+NetORA could use all networks that are accepted by NetGPA. In current release of NetGPA, we have provided a text-mining network(`text_2006_12_NetGPA`), a co-expression network(`ce_v12_08_NetGPA`) and a integrative network(`DEPICT_2015_01_NetGPA`).
+
+In the future, we will release more networks, including co-expression networks for Human, Mouse and Rat. 
+
+# Citation
+If you use NetORA in published research, please cite NetORA and also [@Raychaudhuri2009].
+
+# Session info
+
+```{r sessionInfo}
+sessionInfo()
+```
+
+# References
