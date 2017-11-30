@@ -14,7 +14,7 @@
 #' @return
 #' a list
 #' @examples
-#' library("NetGPA")
+#' library("NetORA")
 #' data(text_2006_12_NetGPA)
 #' data(Example_NetGPA)
 #' ExE_Hyper  <- Example_NetGPA$ExE_Hyper

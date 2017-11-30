@@ -51,7 +51,7 @@ ExE_Hyper     <- Example_NetGPA$ExE_Hyper
 
 ```
 
-We treat `ExE_Hyper` as a annotated pathway.
+We treat `ExE_Hyper` as an annotated pathway.
 
 ### Signatures
 Signatures are gene sets we want to test. Here we use pathways that are frequently mutated in cancers as signatures.
@@ -100,10 +100,25 @@ mergedT[order(mergedT$pvalue), ]
 ```
 You can clearly see that only FGF-related signaling pathways are statistically significant.
 
+## Pre-computed networks
+Building networks is time-consuming, we thus have pre-computed networks for all canonical pathways defined in MSigDB, using FDR 0.05 as cutoff. They can be loaded as a data set in R `data(MSigDB_NetORA_GS)`. Let's revisit the example we discussed above. In our previous study [@Smith2017], we have identified a list of potential pathways that regulate DNA methylation of a signature genes `ExE_Hyper`. In above section, we built a network using `ExE_Hyper`, and tested enrichment potential pathways. Here, we will do it in a reverse way. 
+
+```{r Pre-computed network, eval=TRUE}
+
+data(MSigDB_NetORA_GS)
+PG <- colnames(text_2006_12_NetGPA)
+CancerPathway <- paste0("REACTOME_", Example_NetGPA$CancerPathway)
+mergedT <- NetORA_MSigDB_CP(ExE_Hyper, MSigDB_NetORA_GS[CancerPathway], PG)
+
+mergedT[order(mergedT$pvalue), ]
+```
+As expected, FGF-related signaling pathways are more statistically significant than others.
+
+
 # Network databases
 NetORA could use all networks that are accepted by NetGPA. In current release of NetGPA, we have provided a text-mining network(`text_2006_12_NetGPA`), a co-expression network(`ce_v12_08_NetGPA`) and a integrative network(`DEPICT_2015_01_NetGPA`).
 
-In the future, we will release more networks, including co-expression networks for Human, Mouse and Rat. 
+In the future, we will release more networks, including co-expression networks for Mouse and Rat. 
 
 # Citation
 If you use NetORA in published research, please cite NetORA and also [@Raychaudhuri2009].

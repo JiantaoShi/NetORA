@@ -2,5 +2,6 @@
 
 export(NetORA)
 export(NetORA_GS)
+export(NetORA_MSigDB_CP)
 export(NetORA_Pre)
 export(NetORA_pHyper)

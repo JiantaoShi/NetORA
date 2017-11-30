@@ -18,7 +18,7 @@ a data frame
 This function implements a preprocessing step that find all neighbor of a given pathway.
 }
 \examples{
-library("NetGPA")
+library("NetORA")
 data(text_2006_12_NetGPA)
 data(Example_NetGPA)
 ExE_Hyper  <- Example_NetGPA$ExE_Hyper

@@ -22,7 +22,7 @@ a list
 This function is the core function to test whether a signature is statistically enriched in a pathway in network-level.
 }
 \examples{
-library("NetGPA")
+library("NetORA")
 data(text_2006_12_NetGPA)
 data(Example_NetGPA)
 ExE_Hyper  <- Example_NetGPA$ExE_Hyper
